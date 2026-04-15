@@ -15,7 +15,6 @@ fi
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Install binfmt
-
 docker run --privileged --rm tonistiigi/binfmt --install all
 
 # Read current version from ../package.json
@@ -31,31 +30,19 @@ else
   docker buildx create --name picsur --driver-opt network=host
 fi
 
-docker build \
-  --push \
-  --network host \
-  -t "$PACKAGE_URL-stage1:$VERSION" \
-  -t "$PACKAGE_URL-stage1:latest" \
-  -f ./picsur-stage1.Dockerfile ..
-
-# Exit if stage1 build failed
-if [ $? -ne 0 ]; then
-  echo "Stage1 build failed"
-  exit 1
-fi
-
 docker buildx build \
   --builder picsur \
   --platform linux/amd64,linux/arm64 \
   --push \
   --network host \
+  --build-arg PICSUR_VERSION="$VERSION" \
   -t "$PACKAGE_URL:$VERSION" \
   -t "$PACKAGE_URL:latest" \
-  -f ./picsur-stage2.Dockerfile ..
+  -f ./Dockerfile ..
 
-# Exit if stage2 build failed
+# Exit if build failed
 if [ $? -ne 0 ]; then
-  echo "Stage2 build failed"
+  echo "Build failed"
   exit 1
 fi
 
