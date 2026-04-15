@@ -132,7 +132,8 @@ export class UserService {
     let decoded: any;
     try {
       decoded = decodeToken(token);
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_e) {
       return Fail(FT.UsrValidation, 'Invalid token');
     }
 

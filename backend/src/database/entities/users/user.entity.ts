@@ -1,22 +1,23 @@
 import { EUserSchema } from 'picsur-shared/dist/entities/user.entity';
 import {
-    Column,
-    Entity,
-    Index,
-    OneToMany,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { z } from 'zod';
 import { EApiKeyBackend } from '../apikey.entity.js';
 import { EUsrPreferenceBackend } from '../system/usr-preference.entity.js';
 
 // Different data for public and private
-const OverriddenEUserSchema = EUserSchema.omit({ hashedPassword: true }).merge(
+
+const _OverriddenEUserSchema = EUserSchema.omit({ hashedPassword: true }).merge(
   z.object({
     hashedPassword: z.string().optional(),
   }),
 );
-type OverriddenEUser = z.infer<typeof OverriddenEUserSchema>;
+type OverriddenEUser = z.infer<typeof _OverriddenEUserSchema>;
 
 @Entity()
 export class EUserBackend implements OverriddenEUser {

@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist-test",
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts", "setup-jest.ts"],
+  "exclude": ["node_modules", "dist", "test"]
+}

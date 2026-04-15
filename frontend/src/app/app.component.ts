@@ -38,10 +38,9 @@ export class AppComponent implements OnInit {
     private readonly router: Router,
     private readonly activatedRoute: ActivatedRoute,
     private readonly bootstrapService: BootstrapService,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     usageService: UsageService,
-  ) {
-    usageService;
-  }
+  ) {}
 
   public getRouteAnimData() {
     // Everyone is doing shit with the activated route

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "0.5.7",
+  "version": "0.6.0",
   "scripts": {
     "devdb:start": "docker-compose -f ./support/dev.docker-compose.yml up -d",
     "devdb:stop": "docker-compose -f ./support/dev.docker-compose.yml down",
@@ -11,7 +11,12 @@
     "purge": "rm -rf ./node_modules",
     "purge-all": "./support/purge-all.sh",
     "format": "prettier --write .",
-    "lint": "eslint --fix ."
+    "lint": "eslint --fix .",
+    "test": "pnpm -r test",
+    "test:backend": "cd backend && pnpm test",
+    "test:frontend": "cd frontend && pnpm test",
+    "test:watch": "pnpm -r test -- --watch",
+    "test:cov": "pnpm -r test -- --coverage"
   },
   "pnpm": {
     "overrides": {

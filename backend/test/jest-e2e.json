@@ -1,0 +1,13 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^picsur-shared$": "<rootDir>/../shared/src/index.ts",
+    "^picsur-shared/(.*)$": "<rootDir>/../shared/src/$1"
+  }
+}

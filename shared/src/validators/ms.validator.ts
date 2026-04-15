@@ -6,7 +6,8 @@ export const IsValidMS = (min = 0) =>
     (v: any) => {
       try {
         return ms(v);
-      } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_e) {
         return NaN;
       }
     },

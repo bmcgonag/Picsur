@@ -55,7 +55,8 @@ export class CacheService {
         return data.data;
       }
       return null;
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_e) {
       return null;
     }
   }

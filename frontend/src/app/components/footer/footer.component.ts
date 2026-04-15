@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AutoUnsubscribe } from 'ngx-auto-unsubscribe-decorator';
 import { InfoService } from '../../services/api/info.service';
 
@@ -14,13 +9,9 @@ import { InfoService } from '../../services/api/info.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent implements OnInit {
-  constructor(
-    private readonly infoService: InfoService,
-    private readonly changeDetector: ChangeDetectorRef,
-  ) {}
+  constructor(private readonly infoService: InfoService) {}
 
-  isDemo = false;
-  version = 'Unkown Version';
+  version = '0.0.0';
 
   ngOnInit(): void {
     this.subscribeInfo();
@@ -29,9 +20,7 @@ export class FooterComponent implements OnInit {
   @AutoUnsubscribe()
   subscribeInfo() {
     return this.infoService.live.subscribe((info) => {
-      this.isDemo = info.demo;
-      this.version = 'V' + info.version;
-      this.changeDetector.markForCheck();
+      this.version = info.version;
     });
   }
 }

@@ -1,0 +1,16 @@
+module.exports.Permission = {
+  ImageView: 'image-view',
+  ImageUpload: 'image-upload',
+  ImageDeleteKey: 'image-delete-key',
+  ImageManage: 'image-manage',
+  UserLogin: 'user-login',
+  UserKeepLogin: 'user-keep-login',
+  UserRegister: 'user-register',
+  Settings: 'settings',
+  ApiKey: 'apikey',
+  ImageAdmin: 'image-admin',
+  UserAdmin: 'user-admin',
+  RoleAdmin: 'role-admin',
+  ApiKeyAdmin: 'apikey-admin',
+  SysPrefAdmin: 'syspref-admin',
+};

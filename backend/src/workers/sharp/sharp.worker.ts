@@ -34,7 +34,8 @@ export class SharpWorker {
         soft: 1000 * 1000 * memoryLimit,
         hard: 1000 * 1000 * memoryLimit,
       });
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_e) {
       console.warn('Failed to set memory limit');
     }
 
@@ -76,7 +77,6 @@ export class SharpWorker {
     }
 
     const operation = message.operation;
-    message.operation.parameters;
 
     this.sharpi = (this.sharpi[operation.name] as any)(...operation.parameters);
   }

@@ -9,7 +9,8 @@ export class ClipboardService {
     try {
       const result = await navigator.clipboard.writeText(text);
       return result === undefined;
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_err) {
       return false;
     }
   }
