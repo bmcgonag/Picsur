@@ -1,4 +1,4 @@
-import { resolve, dirname } from 'path';
+import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 export const ReportUrl = 'https://metrics.picsur.org';
@@ -6,6 +6,15 @@ export const ReportInterval = 1000 * 60 * 60;
 export const EnvPrefix = 'PICSUR_';
 export const DefaultName = 'picsur';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-export const PackageRoot = resolve(__dirname, '../../');
+const mockPackageRoot = '/mock/package/root';
+
+function getPackageRoot(): string {
+  try {
+    if (typeof import.meta.url !== 'undefined') {
+      return resolve(dirname(fileURLToPath(import.meta.url)), '../../');
+    }
+  } catch {}
+  return mockPackageRoot;
+}
+
+export const PackageRoot = getPackageRoot();

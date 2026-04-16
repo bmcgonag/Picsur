@@ -81,4 +81,11 @@ export const SysPreferenceUI: {
       'Enable system telemetry, this will send anonymous usage data to the developers.',
     category: 'Usage',
   },
+
+  [SysPreference.RegistrationEnabled]: {
+    name: 'Allow User Registration',
+    helpText:
+      'Allow new users to register accounts. The first registered user will become an administrator.',
+    category: 'Authentication',
+  },
 };

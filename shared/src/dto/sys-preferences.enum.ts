@@ -24,6 +24,8 @@ export enum SysPreference {
   TrackingId = 'tracking_id',
 
   EnableTelemetry = 'enable_telemetry',
+
+  RegistrationEnabled = 'registration_enabled',
 }
 
 export type SysPreferences = SysPreference[];
@@ -50,6 +52,8 @@ export const SysPreferenceValueTypes: {
   [SysPreference.TrackingId]: 'string',
 
   [SysPreference.EnableTelemetry]: 'boolean',
+
+  [SysPreference.RegistrationEnabled]: 'boolean',
 };
 
 export const SysPreferenceValidators: {
@@ -72,4 +76,6 @@ export const SysPreferenceValidators: {
   [SysPreference.TrackingId]: IsEntityID().or(z.literal('')),
 
   [SysPreference.EnableTelemetry]: z.boolean(),
+
+  [SysPreference.RegistrationEnabled]: z.boolean(),
 };

@@ -1,46 +1,71 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Logger,
+  Module,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HasFailed } from 'picsur-shared/dist/types/failable';
 import { generateRandomString } from 'picsur-shared/dist/util/random';
 import { AuthConfigService } from '../../config/early/auth.config.service.js';
 import { EarlyConfigModule } from '../../config/early/early-config.module.js';
 import { EUserBackend } from '../../database/entities/users/user.entity.js';
+import { Permission } from '../../models/constants/permissions.const.js';
 import { PreferenceDbModule } from '../preference-db/preference-db.module.js';
 import { RoleDbModule } from '../role-db/role-db.module.js';
+import { RoleDbService } from '../role-db/role-db.service.js';
 import { UserDbService } from './user-db.service.js';
 
 @Module({
   imports: [
     EarlyConfigModule,
-    RoleDbModule,
     PreferenceDbModule,
+    forwardRef(() => RoleDbModule),
     TypeOrmModule.forFeature([EUserBackend]),
   ],
   providers: [UserDbService],
   exports: [UserDbService],
 })
-export class UserDbModule implements OnModuleInit {
+export class UserDbModule implements OnApplicationBootstrap {
   private readonly logger = new Logger(UserDbModule.name);
 
   constructor(
     private readonly usersService: UserDbService,
     private readonly authConfigService: AuthConfigService,
+    @Inject(forwardRef(() => RoleDbService))
+    private readonly rolesService: RoleDbService,
   ) {}
 
-  async onModuleInit() {
-    await this.ensureUserExists(
-      'guest',
-      // Guest should never be able to login
-      // It should be prevented even if you know the password
-      // But to be sure, we set it to a random string
-      generateRandomString(128),
-      ['guest'],
+  async onApplicationBootstrap() {
+    await this.ensureUserExists('guest', generateRandomString(128), ['guest']);
+    await this.updateGuestRegistrationPermission();
+  }
+
+  public async getUserCount(): Promise<number> {
+    const result = await this.usersService.countExcludingGuest();
+    if (HasFailed(result)) return 0;
+    return result;
+  }
+
+  private async updateGuestRegistrationPermission() {
+    const userCount = await this.getUserCount();
+    const guestRole = await this.rolesService.findOne('guest');
+    if (HasFailed(guestRole)) return;
+
+    const hasRegistration = guestRole.permissions.includes(
+      Permission.UserRegister,
     );
-    await this.ensureUserExists(
-      'admin',
-      this.authConfigService.getDefaultAdminPassword(),
-      ['user', 'admin'],
-    );
+
+    if (userCount > 0 && hasRegistration) {
+      await this.rolesService.removePermissions('guest', [
+        Permission.UserRegister,
+      ]);
+    } else if (userCount === 0 && !hasRegistration) {
+      await this.rolesService.addPermissions('guest', [
+        Permission.UserRegister,
+      ]);
+    }
   }
 
   private async ensureUserExists(

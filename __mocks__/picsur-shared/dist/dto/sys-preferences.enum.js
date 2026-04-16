@@ -1,6 +1,15 @@
 export const SysPreference = {
-  MaxFileSize: 'max_filesize',
+  HostOverride: 'host_override',
+  JwtSecret: 'jwt_secret',
+  JwtExpiresIn: 'jwt_expires_in',
   BCryptStrength: 'bcrypt_strength',
-  KeepOriginal: 'keep_original',
-  JwtExpiry: 'jwt_expiry',
+  RemoveDerivativesAfter: 'remove_derivatives_after',
+  AllowEditing: 'allow_editing',
+  ConversionTimeLimit: 'conversion_time_limit',
+  ConversionMemoryLimit: 'conversion_memory_limit',
+  EnableTracking: 'enable_tracking',
+  TrackingUrl: 'tracking_url',
+  TrackingId: 'tracking_id',
+  EnableTelemetry: 'enable_telemetry',
+  RegistrationEnabled: 'registration_enabled',
 };

@@ -11,7 +11,7 @@ import {
 } from 'picsur-shared/dist/types/failable';
 import { FindResult } from 'picsur-shared/dist/types/find-result';
 import { makeUnique } from 'picsur-shared/dist/util/unique';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { EUserBackend } from '../../database/entities/users/user.entity.js';
 import { Permissions } from '../../models/constants/permissions.const.js';
 import {
@@ -97,7 +97,6 @@ export class UserDbService {
     if (HasFailed(userToModify)) return userToModify;
 
     if (ImmutableUsersList.includes(userToModify.username)) {
-      // Just fail silently
       this.logger.verbose('User tried to modify system user, failed silently');
       return userToModify;
     }
@@ -107,10 +106,15 @@ export class UserDbService {
     );
     const rolesToAdd = this.filterAddedRoles(roles);
     const newRoles = makeUnique([...rolesToKeep, ...rolesToAdd]);
+    this.logger.log(
+      `setRoles: uuid=${uuid}, existingRoles=${JSON.stringify(userToModify.roles)}, rolesToKeep=${JSON.stringify(rolesToKeep)}, rolesToAdd=${JSON.stringify(rolesToAdd)}, newRoles=${JSON.stringify(newRoles)}`,
+    );
     userToModify.roles = newRoles;
 
     try {
-      return await this.usersRepository.save(userToModify);
+      const result = await this.usersRepository.save(userToModify);
+      this.logger.log(`setRoles saved: ${JSON.stringify(result.roles)}`);
+      return result;
     } catch (e) {
       return Fail(FT.Database, e);
     }
@@ -266,6 +270,18 @@ export class UserDbService {
   public async count(): AsyncFailable<number> {
     try {
       return await this.usersRepository.count();
+    } catch (e) {
+      return Fail(FT.Database, e);
+    }
+  }
+
+  public async countExcludingGuest(): AsyncFailable<number> {
+    try {
+      return await this.usersRepository.count({
+        where: {
+          username: Not('guest'),
+        },
+      });
     } catch (e) {
       return Fail(FT.Database, e);
     }

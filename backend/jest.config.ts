@@ -11,12 +11,15 @@ const config: Config = {
       'ts-jest',
       {
         tsconfig: 'tsconfig.test.json',
+        useESM: true,
+        isolatedModules: true,
       },
     ],
   },
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
+  extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^picsur-shared$': mockBase + '/index.js',
     '^picsur-shared/dist/types/(.*)$': mockBase + '/dist/types/$1.js',

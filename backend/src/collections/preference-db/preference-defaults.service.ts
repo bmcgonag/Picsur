@@ -52,6 +52,8 @@ export class PreferenceDefaultsService {
     [SysPreference.TrackingId]: '',
 
     [SysPreference.EnableTelemetry]: true,
+
+    [SysPreference.RegistrationEnabled]: true,
   };
 
   public getSysDefault(pref: SysPreference): PrefValueType {

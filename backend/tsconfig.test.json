@@ -3,10 +3,12 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "target": "ES2020",
     "outDir": "./dist-test",
     "declaration": false,
     "emitDecoratorMetadata": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["node", "jest"]
   },
   "include": ["src/**/*.ts", "setup-jest.ts"],
   "exclude": ["node_modules", "dist", "test"]

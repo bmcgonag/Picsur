@@ -21,7 +21,7 @@ import { GuestService } from './guest.service.js';
 @Module({
   imports: [
     UserDbModule,
-    PassportModule,
+    PassportModule.register({ session: false, defaultStrategy: 'jwt' }),
     PreferenceDbModule,
     ApiKeyDbModule,
     LateConfigModule,

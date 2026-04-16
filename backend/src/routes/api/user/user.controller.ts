@@ -9,8 +9,13 @@ import {
   UserRegisterResponse,
 } from 'picsur-shared/dist/dto/api/user.dto';
 import type { EUser } from 'picsur-shared/dist/entities/user.entity';
-import { ThrowIfFailed } from 'picsur-shared/dist/types/failable';
+import {
+  HasFailed,
+  HasSuccess,
+  ThrowIfFailed,
+} from 'picsur-shared/dist/types/failable';
 import { UserDbService } from '../../../collections/user-db/user-db.service.js';
+import { RoleDbService } from '../../../collections/role-db/role-db.service.js';
 import { EasyThrottle } from '../../../decorators/easy-throttle.decorator.js';
 import {
   NoPermissions,
@@ -33,6 +38,7 @@ export class UserController {
   constructor(
     private readonly usersService: UserDbService,
     private readonly authService: AuthManagerService,
+    private readonly rolesService: RoleDbService,
   ) {}
 
   @Post('login')
@@ -52,9 +58,40 @@ export class UserController {
   async register(
     @Body() register: UserRegisterRequest,
   ): Promise<UserRegisterResponse> {
-    const user = ThrowIfFailed(
+    const userCount = await this.usersService.countExcludingGuest();
+    const isFirstUser = HasSuccess(userCount) ? userCount === 0 : true;
+
+    let user = ThrowIfFailed(
       await this.usersService.create(register.username, register.password),
     );
+
+    if (isFirstUser) {
+      this.logger.log('First user detected, setting admin role...');
+      const setRolesResult = await this.usersService.setRoles(user.id, [
+        'user',
+        'admin',
+      ]);
+      if (HasFailed(setRolesResult)) {
+        this.logger.error(
+          `Failed to set admin role: ${setRolesResult.getReason()}`,
+        );
+      } else {
+        this.logger.log('Admin role set successfully');
+        user = ThrowIfFailed(await this.usersService.findOne(user.id));
+      }
+
+      const removePermResult = await this.rolesService.removePermissions(
+        'guest',
+        [Permission.UserRegister],
+      );
+      if (HasFailed(removePermResult)) {
+        this.logger.error(
+          `Failed to disable registration: ${removePermResult.getReason()}`,
+        );
+      } else {
+        this.logger.log('Registration disabled successfully');
+      }
+    }
 
     return EUserBackend2EUser(user);
   }

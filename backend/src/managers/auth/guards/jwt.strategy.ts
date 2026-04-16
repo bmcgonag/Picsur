@@ -1,11 +1,35 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy as JwtPassportStrategy } from 'passport-jwt';
+import { Strategy as JwtPassportStrategy } from 'passport-jwt';
 import { JwtDataSchema } from 'picsur-shared/dist/dto/jwt.dto';
 import { EUser } from 'picsur-shared/dist/entities/user.entity';
 import { ThrowIfFailed } from 'picsur-shared/dist/types/failable';
 import { UserDbService } from '../../../collections/user-db/user-db.service.js';
 import { EUserBackend2EUser } from '../../../models/transformers/user.transformer.js';
+
+const customJwtExtractor = (req: any) => {
+  let authHeader = null;
+
+  if (req?.headers?.authorization) {
+    authHeader = req.headers.authorization;
+  } else if (req?.raw?.headers?.authorization) {
+    authHeader = req.raw.headers.authorization;
+  } else if (typeof req?.authorization === 'string') {
+    authHeader = req.authorization;
+  }
+
+  if (typeof authHeader === 'string') {
+    authHeader = authHeader.trim();
+    if (authHeader.startsWith('"') && authHeader.endsWith('"')) {
+      authHeader = authHeader.substring(1, authHeader.length - 1);
+    }
+  }
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+  return null;
+};
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(JwtPassportStrategy, 'jwt') {
@@ -15,9 +39,8 @@ export class JwtStrategy extends PassportStrategy(JwtPassportStrategy, 'jwt') {
     @Inject('JWT_SECRET') jwtSecret: string,
     private readonly usersService: UserDbService,
   ) {
-    // This will validate the jwt token itself
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: customJwtExtractor,
       ignoreExpiration: false,
       secretOrKey: jwtSecret,
     });
@@ -34,7 +57,6 @@ export class JwtStrategy extends PassportStrategy(JwtPassportStrategy, 'jwt') {
       await this.usersService.findOne(result.data.uid),
     );
 
-    // And return the user
     return EUserBackend2EUser(backendUser);
   }
 }
