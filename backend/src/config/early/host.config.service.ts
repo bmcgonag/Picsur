@@ -36,6 +36,10 @@ export class HostConfigService {
     return ParseInt(this.configService.get(`${EnvPrefix}PORT`), 8080);
   }
 
+  public getOrigin(): string | undefined {
+    return ParseString(this.configService.get(`${EnvPrefix}ORIGIN`)) ?? undefined;
+  }
+
   public isDemo() {
     return ParseBool(this.configService.get(`${EnvPrefix}DEMO`), false);
   }

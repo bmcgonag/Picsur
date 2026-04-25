@@ -9,6 +9,7 @@ import {
   JwtSecretProvider,
 } from '../../config/late/jwt.config.service.js';
 import { LateConfigModule } from '../../config/late/late-config.module.js';
+import { OidcModule } from '../oidc/oidc.module.js';
 import { AuthManagerService } from './auth.service.js';
 import { ApiKeyStrategy } from './guards/apikey.strategy.js';
 import { GuestStrategy } from './guards/guest.strategy.js';
@@ -25,6 +26,7 @@ import { GuestService } from './guest.service.js';
     PreferenceDbModule,
     ApiKeyDbModule,
     LateConfigModule,
+    OidcModule,
     JwtModule.registerAsync({
       useExisting: JwtConfigService,
       imports: [LateConfigModule],

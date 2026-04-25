@@ -24,6 +24,18 @@ import {
   UndeletableUsersList,
 } from '../../../models/constants/special-users.const.js';
 import { EUserBackend2EUser } from '../../../models/transformers/user.transformer.js';
+import { z } from 'zod';
+
+const UserLinkOidcRequest = z.object({
+  userId: z.string().uuid(),
+  externalId: z.string().min(1),
+});
+type UserLinkOidcRequest = z.infer<typeof UserLinkOidcRequest>;
+
+const UserUnlinkOidcRequest = z.object({
+  userId: z.string().uuid(),
+});
+type UserUnlinkOidcRequest = z.infer<typeof UserUnlinkOidcRequest>;
 
 @Controller('api/user')
 @RequiredPermissions(Permission.UserAdmin)
@@ -56,6 +68,8 @@ export class UserAdminController {
         create.username,
         create.password,
         create.roles,
+        undefined,
+        create.email,
       ),
     );
 
@@ -98,6 +112,16 @@ export class UserAdminController {
       );
     }
 
+    if (body.email !== undefined) {
+      if (body.email) {
+        user = ThrowIfFailed(
+          await this.usersService.setEmail(body.id, body.email),
+        );
+      } else {
+        user = ThrowIfFailed(await this.usersService.removeEmail(body.id));
+      }
+    }
+
     return EUserBackend2EUser(user);
   }
 
@@ -109,5 +133,23 @@ export class UserAdminController {
       LockedLoginUsersList,
       UndeletableUsersList,
     };
+  }
+
+  @Post('link-oidc')
+  @EasyThrottle(20)
+  async linkOidc(@Body() body: UserLinkOidcRequest) {
+    const user = ThrowIfFailed(
+      await this.usersService.setExternalId(body.userId, body.externalId),
+    );
+    return { success: true, user: EUserBackend2EUser(user) };
+  }
+
+  @Post('unlink-oidc')
+  @EasyThrottle(20)
+  async unlinkOidc(@Body() body: UserUnlinkOidcRequest) {
+    const user = ThrowIfFailed(
+      await this.usersService.unlinkExternalId(body.userId),
+    );
+    return { success: true, user: EUserBackend2EUser(user) };
   }
 }

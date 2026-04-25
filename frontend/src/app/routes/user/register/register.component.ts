@@ -55,7 +55,11 @@ export class RegisterComponent implements OnInit {
     }
 
     this.loading = true;
-    const user = await this.userService.register(data.username, data.password);
+    const user = await this.userService.register(
+      data.username,
+      data.password,
+      data.email,
+    );
     if (HasFailed(user)) {
       this.loading = false;
 

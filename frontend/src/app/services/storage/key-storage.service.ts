@@ -20,13 +20,17 @@ export class KeyStorageService {
   }
 
   public get() {
-    setTimeout(this.load.bind(this), 0);
+    if (!this.key) {
+      this.load();
+    }
     return this.key;
   }
 
   public set(key: string) {
+    console.log('KeyStorageService.set called with:', key?.substring(0, 20) + '...');
     this.key = key;
     this.store();
+    console.log('Key stored, localStorage:', localStorage.getItem('apiKey')?.substring(0, 20) + '...');
   }
 
   public clear() {

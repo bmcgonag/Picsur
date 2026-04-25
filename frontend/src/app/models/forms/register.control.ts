@@ -3,14 +3,17 @@ import { Fail, Failable, FT } from 'picsur-shared/dist/types/failable';
 import { UserPassModel } from '../forms-dto/userpass.dto';
 import { Compare } from '../validators/compare.validator';
 import {
+  CreateEmailError,
   CreatePasswordError,
   CreateUsernameError,
+  EmailValidators,
   PasswordValidators,
   UsernameValidators,
 } from '../validators/user.validator';
 
 export class RegisterControl {
   public username = new FormControl('', UsernameValidators);
+  public email = new FormControl('', EmailValidators);
   public password = new FormControl('', PasswordValidators);
   public passwordConfirm = new FormControl('', [
     ...PasswordValidators,
@@ -19,6 +22,10 @@ export class RegisterControl {
 
   public get usernameError() {
     return CreateUsernameError(this.username.errors);
+  }
+
+  public get emailError() {
+    return CreateEmailError(this.email.errors);
   }
 
   public get passwordError() {
@@ -44,6 +51,7 @@ export class RegisterControl {
     return {
       username: this.username.value ?? '',
       password: this.password.value ?? '',
+      email: this.email.value || undefined,
     };
   }
 
@@ -51,5 +59,6 @@ export class RegisterControl {
     this.username.setValue(data.username);
     this.password.setValue(data.password);
     this.passwordConfirm.setValue(data.password);
+    this.email.setValue(data.email ?? null);
   }
 }

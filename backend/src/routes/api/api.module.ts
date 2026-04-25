@@ -6,6 +6,7 @@ import { PrefModule } from './pref/pref.module.js';
 import { RolesApiModule } from './roles/roles.module.js';
 import { UsageApiModule } from './usage/usage.module.js';
 import { UserApiModule } from './user/user.module.js';
+import { OidcModule } from '../../managers/oidc/oidc.module.js';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UserApiModule } from './user/user.module.js';
     RolesApiModule,
     ApiKeysModule,
     UsageApiModule,
+    OidcModule,
   ],
 })
 export class PicsurApiModule {}

@@ -3,6 +3,7 @@ import { EUserSchema } from '../../entities/user.entity.js';
 import { createZodDto } from '../../util/create-zod-dto.js';
 import { IsStringList } from '../../validators/string-list.validator.js';
 import {
+  IsEmail,
   IsPlainTextPwd,
   IsUsername,
 } from '../../validators/user.validators.js';
@@ -23,7 +24,11 @@ export const UserLoginResponseSchema = z.object({
 export class UserLoginResponse extends createZodDto(UserLoginResponseSchema) {}
 
 // UserRegister
-export const UserRegisterRequestSchema = UserPassSchema;
+export const UserRegisterRequestSchema = UserPassSchema.merge(
+  z.object({
+    email: IsEmail().optional(),
+  }),
+);
 export class UserRegisterRequest extends createZodDto(
   UserRegisterRequestSchema,
 ) {}

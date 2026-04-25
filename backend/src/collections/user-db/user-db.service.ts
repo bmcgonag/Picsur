@@ -46,9 +46,15 @@ export class UserDbService {
     roles?: string[],
     // Add option to create "invalid" users, should only be used by system
     byPassRoleCheck?: boolean,
+    email?: string,
   ): AsyncFailable<EUserBackend> {
     if (await this.exists(username))
       return Fail(FT.Conflict, 'User already exists');
+
+    if (email) {
+      const emailExists = await this.emailExists(email);
+      if (emailExists) return Fail(FT.Conflict, 'Email already in use');
+    }
 
     const strength = await this.getBCryptStrength();
     const hashedPassword = await bcrypt.hash(password, strength);
@@ -56,6 +62,9 @@ export class UserDbService {
     const user = new EUserBackend();
     user.username = username;
     user.hashed_password = hashedPassword;
+    if (email) {
+      user.email = email;
+    }
     if (byPassRoleCheck) {
       const rolesToAdd = roles ?? [];
       user.roles = makeUnique(rolesToAdd);
@@ -289,6 +298,139 @@ export class UserDbService {
 
   public async exists(username: string): Promise<boolean> {
     return HasSuccess(await this.findByUsername(username));
+  }
+
+  // OIDC methods
+
+  public async findByExternalId(
+    externalId: string,
+  ): AsyncFailable<EUserBackend> {
+    try {
+      const found = await this.usersRepository.findOne({
+        where: { external_id: externalId },
+      });
+
+      if (!found) return Fail(FT.NotFound, 'User not found');
+      return found;
+    } catch (e) {
+      return Fail(FT.Database, e);
+    }
+  }
+
+  public async findByEmail(email: string): AsyncFailable<EUserBackend> {
+    try {
+      const found = await this.usersRepository.findOne({
+        where: { email: email },
+      });
+
+      if (!found) return Fail(FT.NotFound, 'User not found');
+      return found;
+    } catch (e) {
+      return Fail(FT.Database, e);
+    }
+  }
+
+  public async emailExists(email: string): Promise<boolean> {
+    try {
+      const found = await this.usersRepository.findOne({
+        where: { email: email },
+        select: ['id'],
+      });
+      return !!found;
+    } catch {
+      return false;
+    }
+  }
+
+  public async setExternalId(
+    uuid: string,
+    externalId: string,
+  ): AsyncFailable<EUserBackend> {
+    const userToModify = await this.findOne(uuid);
+    if (HasFailed(userToModify)) return userToModify;
+
+    userToModify.external_id = externalId;
+
+    try {
+      return await this.usersRepository.save(userToModify);
+    } catch (e) {
+      return Fail(FT.Database, e);
+    }
+  }
+
+  public async createWithExternalId(
+    username: string,
+    externalId: string,
+    roles?: string[],
+    email?: string,
+  ): AsyncFailable<EUserBackend> {
+    if (await this.exists(username))
+      return Fail(FT.Conflict, 'User already exists');
+
+    if (email) {
+      const emailExists = await this.emailExists(email);
+      if (emailExists) return Fail(FT.Conflict, 'Email already in use');
+    }
+
+    const user = new EUserBackend();
+    user.username = username;
+    user.external_id = externalId;
+    user.email = email;
+    user.roles = makeUnique([...DefaultRolesList, ...(roles ?? [])]);
+
+    try {
+      return await this.usersRepository.save(user);
+    } catch (e) {
+      return Fail(FT.Database, e);
+    }
+  }
+
+  public async unlinkExternalId(uuid: string): AsyncFailable<EUserBackend> {
+    const userToModify = await this.findOne(uuid);
+    if (HasFailed(userToModify)) return userToModify;
+
+    try {
+      await this.usersRepository.update(uuid, { external_id: undefined });
+      return await this.findOne(uuid);
+    } catch (e) {
+      return Fail(FT.Database, e);
+    }
+  }
+
+  public async setEmail(
+    uuid: string,
+    email: string,
+  ): AsyncFailable<EUserBackend> {
+    const userToModify = await this.findOne(uuid);
+    if (HasFailed(userToModify)) return userToModify;
+
+    const emailExists = await this.emailExists(email);
+    if (emailExists) {
+      const existingUser = await this.findByEmail(email);
+      if (HasSuccess(existingUser) && existingUser.id !== uuid) {
+        return Fail(FT.Conflict, 'Email already in use');
+      }
+    }
+
+    userToModify.email = email;
+
+    try {
+      return await this.usersRepository.save(userToModify);
+    } catch (e) {
+      return Fail(FT.Database, e);
+    }
+  }
+
+  public async removeEmail(uuid: string): AsyncFailable<EUserBackend> {
+    const userToModify = await this.findOne(uuid);
+    if (HasFailed(userToModify)) return userToModify;
+
+    try {
+      await this.usersRepository.update(uuid, { email: undefined });
+      return await this.findOne(uuid);
+    } catch (e) {
+      return Fail(FT.Database, e);
+    }
   }
 
   // Internal

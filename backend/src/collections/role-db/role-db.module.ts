@@ -1,4 +1,4 @@
-import { forwardRef, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HasFailed } from 'picsur-shared/dist/types/failable';
 import { EarlyConfigModule } from '../../config/early/early-config.module.js';

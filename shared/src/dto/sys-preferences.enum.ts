@@ -26,6 +26,14 @@ export enum SysPreference {
   EnableTelemetry = 'enable_telemetry',
 
   RegistrationEnabled = 'registration_enabled',
+
+  OidcEnabled = 'oidc_enabled',
+  OidcIssuer = 'oidc_issuer',
+  OidcClientId = 'oidc_client_id',
+  OidcClientSecret = 'oidc_client_secret',
+  OidcAutoLinkByEmail = 'oidc_auto_link_by_email',
+  OidcProviderName = 'oidc_provider_name',
+  DisableBuiltinAuth = 'disable_builtin_auth',
 }
 
 export type SysPreferences = SysPreference[];
@@ -54,6 +62,14 @@ export const SysPreferenceValueTypes: {
   [SysPreference.EnableTelemetry]: 'boolean',
 
   [SysPreference.RegistrationEnabled]: 'boolean',
+
+  [SysPreference.OidcEnabled]: 'boolean',
+  [SysPreference.OidcIssuer]: 'string',
+  [SysPreference.OidcClientId]: 'string',
+  [SysPreference.OidcClientSecret]: 'string',
+  [SysPreference.OidcAutoLinkByEmail]: 'boolean',
+  [SysPreference.OidcProviderName]: 'string',
+  [SysPreference.DisableBuiltinAuth]: 'boolean',
 };
 
 export const SysPreferenceValidators: {
@@ -78,4 +94,12 @@ export const SysPreferenceValidators: {
   [SysPreference.EnableTelemetry]: z.boolean(),
 
   [SysPreference.RegistrationEnabled]: z.boolean(),
+
+  [SysPreference.OidcEnabled]: z.boolean(),
+  [SysPreference.OidcIssuer]: z.string().url().or(z.literal('')),
+  [SysPreference.OidcClientId]: z.string(),
+  [SysPreference.OidcClientSecret]: z.string(),
+  [SysPreference.OidcAutoLinkByEmail]: z.boolean(),
+  [SysPreference.OidcProviderName]: z.string().max(50),
+  [SysPreference.DisableBuiltinAuth]: z.boolean(),
 };

@@ -10,6 +10,8 @@ services:
       # PICSUR_PORT: 8080
 
       PICSUR_DB_HOST: picsur_postgres
+      PICSUR_PRODUCTION: 'false'
+      # PICSUR_ORIGIN: 'https://myimg.routemehome.org'
       # PICSUR_DB_PORT: 5432
       # PICSUR_DB_USERNAME: picsur
       # PICSUR_DB_PASSWORD: picsur
@@ -28,6 +30,32 @@ services:
 
       ## Warning: Verbose mode might log sensitive data
       # PICSUR_VERBOSE: "true"
+
+      ## ===========================================
+      ## OIDC / OAuth Authentication Configuration
+      ## ===========================================
+      ## Enable OIDC authentication (e.g., Authentik, Keycloak, Authelia, Google, GitHub, etc.)
+      # PICSUR_OIDC_ENABLED: "false"
+      ## The base URL of your OIDC provider (include /.well-known/openid-configuration path)
+      ## Examples:
+      ##   Authentik: https://authentik.example.com/application/o/picsur/
+      ##   Keycloak: https://keycloak.example.com/realms/master
+      ##   Authelia: https://auth.example.com
+      ##   Google: https://accounts.google.com
+      ##   GitHub: https://github.com
+      # PICSUR_OIDC_ISSUER: ""
+      ## Client ID registered with your OIDC provider
+      # PICSUR_OIDC_CLIENT_ID: ""
+      ## Client Secret registered with your OIDC provider (keep this secret!)
+      # PICSUR_OIDC_CLIENT_SECRET: ""
+      ## Automatically link OIDC users to existing Picsur accounts by matching email
+      ## Set to "false" if you want to manually link users via admin settings
+      # PICSUR_OIDC_AUTO_LINK_BY_EMAIL: "true"
+      ## Custom name for the OIDC provider displayed on the login button (e.g., Authentik, Keycloak, My SSO)
+      # PICSUR_OIDC_PROVIDER_NAME: "OIDC"
+      ## Disable built-in username/password authentication (only OIDC will work)
+      ## API keys will still work regardless of this setting
+      # PICSUR_DISABLE_BUILTIN_AUTH: "false"
     restart: unless-stopped
   picsur_postgres:
     image: postgres:17-alpine

@@ -54,6 +54,14 @@ export class PreferenceDefaultsService {
     [SysPreference.EnableTelemetry]: true,
 
     [SysPreference.RegistrationEnabled]: true,
+
+    [SysPreference.OidcEnabled]: false,
+    [SysPreference.OidcIssuer]: '',
+    [SysPreference.OidcClientId]: '',
+    [SysPreference.OidcClientSecret]: '',
+    [SysPreference.OidcAutoLinkByEmail]: true,
+    [SysPreference.OidcProviderName]: 'OIDC',
+    [SysPreference.DisableBuiltinAuth]: false,
   };
 
   public getSysDefault(pref: SysPreference): PrefValueType {

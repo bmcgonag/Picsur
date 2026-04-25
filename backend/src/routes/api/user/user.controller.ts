@@ -9,13 +9,17 @@ import {
   UserRegisterResponse,
 } from 'picsur-shared/dist/dto/api/user.dto';
 import type { EUser } from 'picsur-shared/dist/entities/user.entity';
+import { SysPreference } from 'picsur-shared/dist/dto/sys-preferences.enum';
 import {
+  Fail,
+  FT,
   HasFailed,
   HasSuccess,
   ThrowIfFailed,
 } from 'picsur-shared/dist/types/failable';
 import { UserDbService } from '../../../collections/user-db/user-db.service.js';
 import { RoleDbService } from '../../../collections/role-db/role-db.service.js';
+import { SysPreferenceDbService } from '../../../collections/preference-db/sys-preference-db.service.js';
 import { EasyThrottle } from '../../../decorators/easy-throttle.decorator.js';
 import {
   NoPermissions,
@@ -39,6 +43,7 @@ export class UserController {
     private readonly usersService: UserDbService,
     private readonly authService: AuthManagerService,
     private readonly rolesService: RoleDbService,
+    private readonly prefService: SysPreferenceDbService,
   ) {}
 
   @Post('login')
@@ -51,6 +56,27 @@ export class UserController {
     return { jwt_token };
   }
 
+  private async checkBuiltinAuthEnabled(): Promise<void> {
+    const isDisabled = await this.prefService.getBooleanPreference(
+      SysPreference.DisableBuiltinAuth,
+    );
+    if (HasFailed(isDisabled) || !isDisabled) return;
+
+    const isOidcEnabled = await this.prefService.getBooleanPreference(
+      SysPreference.OidcEnabled,
+    );
+    if (HasFailed(isOidcEnabled) || !isOidcEnabled) {
+      throw Fail(
+        FT.Permission,
+        'Authentication is not configured on this server',
+      );
+    }
+    throw Fail(
+      FT.Permission,
+      'Built-in authentication is disabled, please use SSO/OAuth',
+    );
+  }
+
   @Post('register')
   @Returns(UserRegisterResponse)
   @RequiredPermissions(Permission.UserRegister)
@@ -58,11 +84,19 @@ export class UserController {
   async register(
     @Body() register: UserRegisterRequest,
   ): Promise<UserRegisterResponse> {
+    await this.checkBuiltinAuthEnabled();
+
     const userCount = await this.usersService.countExcludingGuest();
     const isFirstUser = HasSuccess(userCount) ? userCount === 0 : true;
 
     let user = ThrowIfFailed(
-      await this.usersService.create(register.username, register.password),
+      await this.usersService.create(
+        register.username,
+        register.password,
+        undefined,
+        undefined,
+        register.email,
+      ),
     );
 
     if (isFirstUser) {
@@ -103,6 +137,8 @@ export class UserController {
   async checkName(
     @Body() checkName: UserCheckNameRequest,
   ): Promise<UserCheckNameResponse> {
+    await this.checkBuiltinAuthEnabled();
+
     return ThrowIfFailed(
       await this.usersService.checkUsername(checkName.username),
     );

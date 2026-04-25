@@ -106,6 +106,23 @@ To re-enable registration, go to `settings -> roles -> guest -> edit`, and give 
 
 It is only possible to use the clipboard functionality on HTTPS websites or localhost. Please ensure you are running Picsur with HTTPS.
 
+### How do I configure OIDC authentication?
+
+Picsur supports OIDC/OAuth2 login via providers like Authentik, Keycloak, or Google. To enable it, set these environment variables:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `PICSUR_OIDC_ENABLED` | Enable OIDC auth | `true` |
+| `PICSUR_OIDC_ISSUER` | OIDC provider issuer URL | `https://auth.example.com/application/o/picsur/` |
+| `PICSUR_OIDC_CLIENT_ID` | Client ID from your OIDC provider | |
+| `PICSUR_OIDC_CLIENT_SECRET` | Client secret from your OIDC provider | |
+| `PICSUR_OIDC_PROVIDER_NAME` | Display name for login button | `Authentik` |
+| `PICSUR_OIDC_AUTO_LINK_BY_EMAIL` | Auto-link existing users by email | `true` |
+| `PICSUR_DISABLE_BUILTIN_AUTH` | Disable username/password login | `false` |
+| `PICSUR_ORIGIN` | Your Picsur URL (required for OIDC) | `https://picsur.example.com` |
+
+After enabling, the OIDC login button will appear on the login page. When clicked, a popup window will open for authentication with your OIDC provider.
+
 ## Running your own instance
 
 You easily run this service yourself via Docker. The file in the project under the `support` directory called picsurdocker-compose.ymal is there for production use.

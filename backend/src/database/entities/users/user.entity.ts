@@ -15,6 +15,8 @@ import { EUsrPreferenceBackend } from '../system/usr-preference.entity.js';
 const _OverriddenEUserSchema = EUserSchema.omit({ hashedPassword: true }).merge(
   z.object({
     hashedPassword: z.string().optional(),
+    externalId: z.string().optional(),
+    email: z.string().email().optional(),
   }),
 );
 type OverriddenEUser = z.infer<typeof _OverriddenEUserSchema>;
@@ -33,6 +35,14 @@ export class EUserBackend implements OverriddenEUser {
 
   @Column({ nullable: false, select: false })
   hashed_password?: string;
+
+  @Index()
+  @Column({ nullable: true, unique: true })
+  external_id?: string;
+
+  @Index()
+  @Column({ nullable: true, unique: true })
+  email?: string;
 
   // This will never be populated, it is only here to auto delete apikeys when a user is deleted
   @OneToMany(() => EApiKeyBackend, (apikey) => apikey.user)

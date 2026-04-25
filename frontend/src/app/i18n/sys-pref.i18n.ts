@@ -88,4 +88,46 @@ export const SysPreferenceUI: {
       'Allow new users to register accounts. The first registered user will become an administrator.',
     category: 'Authentication',
   },
+
+  [SysPreference.OidcEnabled]: {
+    name: 'Enable OIDC Authentication',
+    helpText:
+      'Enable OpenID Connect (OIDC) authentication. Users can log in using OAuth/OIDC providers like Authentik, Keycloak, or Google.',
+    category: 'OIDC Authentication',
+  },
+  [SysPreference.OidcIssuer]: {
+    name: 'OIDC Issuer URL',
+    helpText:
+      'The URL of your OIDC provider (e.g., https://authentik.example.com, https://keycloak.example.com/realms/master). This is the .well-known/openid-configuration endpoint base.',
+    category: 'OIDC Authentication',
+  },
+  [SysPreference.OidcClientId]: {
+    name: 'OIDC Client ID',
+    helpText: 'The client ID registered with your OIDC provider.',
+    category: 'OIDC Authentication',
+  },
+  [SysPreference.OidcClientSecret]: {
+    name: 'OIDC Client Secret',
+    helpText:
+      'The client secret registered with your OIDC provider. Keep this secret!',
+    category: 'OIDC Authentication',
+  },
+  [SysPreference.OidcAutoLinkByEmail]: {
+    name: 'Auto-link Users by Email',
+    helpText:
+      'When an OIDC user logs in with an email that matches an existing Picsur account, automatically link the accounts. Disable to require manual admin linking.',
+    category: 'OIDC Authentication',
+  },
+  [SysPreference.OidcProviderName]: {
+    name: 'OIDC Provider Name',
+    helpText:
+      'The name displayed on the login button (e.g., Authentik, Keycloak, My SSO). Defaults to "OIDC".',
+    category: 'OIDC Authentication',
+  },
+  [SysPreference.DisableBuiltinAuth]: {
+    name: 'Disable Built-in Authentication',
+    helpText:
+      'When enabled, the built-in username/password authentication will be disabled. Only OIDC authentication will be available. API keys will still work.',
+    category: 'OIDC Authentication',
+  },
 };

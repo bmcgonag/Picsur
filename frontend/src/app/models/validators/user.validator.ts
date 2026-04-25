@@ -52,3 +52,19 @@ export const CreatePasswordError = (
       return 'Invalid password';
   }
 };
+
+export const EmailValidators = [Validators.email, Validators.maxLength(254)];
+
+export const CreateEmailError = (errors: ValidationErrors | null): string => {
+  const error = errorsToError(errors);
+  switch (error) {
+    case 'required':
+      return 'Email is required';
+    case 'email':
+      return 'Invalid email format';
+    case 'maxlength':
+      return 'Email is too long';
+    default:
+      return 'Invalid email';
+  }
+};

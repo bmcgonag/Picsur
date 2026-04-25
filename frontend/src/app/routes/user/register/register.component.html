@@ -32,6 +32,22 @@
 
       <div class="col-12 py-2">
         <mat-form-field appearance="outline">
+          <mat-label>Email (optional, for SSO linking)</mat-label>
+          <input
+            matInput
+            type="email"
+            [formControl]="model.email"
+            name="email"
+            autocomplete="email"
+          />
+          <mat-error *ngIf="model.email.errors">
+            {{ model.emailError }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 py-2">
+        <mat-form-field appearance="outline">
           <mat-label>Password</mat-label>
           <input
             matInput

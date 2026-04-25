@@ -4,8 +4,10 @@ import {
   UserUpdateRequest,
 } from 'picsur-shared/dist/dto/api/user-manage.dto';
 import {
+  CreateEmailError,
   CreatePasswordError,
   CreateUsernameError,
+  EmailValidators,
   PasswordValidators,
   UsernameValidators,
 } from '../validators/user.validator';
@@ -13,6 +15,7 @@ import {
 export class UpdateUserControl {
   private id = '';
   public username = new FormControl('', UsernameValidators);
+  public email = new FormControl('', [...EmailValidators]);
   public password = new FormControl('', PasswordValidators);
   public roles = new FormControl<string[]>([]);
 
@@ -22,6 +25,10 @@ export class UpdateUserControl {
 
   public get usernameError() {
     return CreateUsernameError(this.username.errors);
+  }
+
+  public get emailError() {
+    return CreateEmailError(this.email.errors);
   }
 
   public get passwordError() {
@@ -42,6 +49,10 @@ export class UpdateUserControl {
     this.username.setValue(username);
   }
 
+  public putEmail(email: string | undefined) {
+    this.email.setValue(email ?? null);
+  }
+
   public putRoles(roles: string[]) {
     this.roles.setValue(roles);
   }
@@ -51,6 +62,7 @@ export class UpdateUserControl {
       username: this.username.value ?? '',
       password: this.password.value ?? '',
       roles: this.selectedRoles,
+      ...(this.email.value && { email: this.email.value }),
     };
   }
 

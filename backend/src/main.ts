@@ -1,4 +1,5 @@
 import fastifyHelmet from '@fastify/helmet';
+import fastifyCookie from '@fastify/cookie';
 import multipart from '@fastify/multipart';
 import fastifyReplyFrom from '@fastify/reply-from';
 import { NestFactory } from '@nestjs/core';
@@ -32,6 +33,7 @@ async function bootstrap() {
   await fastifyAdapter.register(multipart as any);
   await fastifyAdapter.register(fastifyHelmet as any, HelmetOptions);
   await fastifyAdapter.register(fastifyReplyFrom as any);
+  await fastifyAdapter.register(fastifyCookie as any);
 
   // Create nest app
   const app = await NestFactory.create<NestFastifyApplication>(

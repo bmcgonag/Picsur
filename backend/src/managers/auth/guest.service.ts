@@ -9,6 +9,7 @@ export class GuestService {
 
   constructor(private readonly usersService: UserDbService) {
     this.fallBackUser = new EUserBackend();
+    this.fallBackUser.id = '00000000-0000-0000-0000-000000000000';
     this.fallBackUser.username = 'guest';
     this.fallBackUser.roles = ['guest'];
   }

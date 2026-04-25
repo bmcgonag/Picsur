@@ -102,16 +102,25 @@ export class UserService {
   public async register(
     username: string,
     password: string,
+    email?: string,
   ): AsyncFailable<EUser> {
-    return await this.api.post(
+    const response = await this.api.post(
       UserRegisterRequest,
       UserRegisterResponse,
       '/api/user/register',
       {
         username,
         password,
+        ...(email && { email }),
       },
     ).result;
+    if (HasFailed(response)) return response;
+
+    const user = await this.fetchUser();
+    if (HasFailed(user)) return user;
+
+    this.userSubject.next(user);
+    return user;
   }
 
   public async logout(): AsyncFailable<EUser> {
@@ -153,5 +162,41 @@ export class UserService {
 
     this.key.set(got.token);
     return got.user;
+  }
+
+  public async getOidcConfig(): AsyncFailable<{
+    enabled: boolean;
+    disableBuiltinAuth: boolean;
+    providerName: string;
+  }> {
+    try {
+      const response = await fetch('/api/auth/oidc/config', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        this.logger.debug(`OIDC config fetch failed: ${response.status}`);
+        return Fail(FT.Network, 'Failed to get OIDC config');
+      }
+
+      const json = await response.json();
+      const data = (json as { data?: {
+        enabled: boolean;
+        disableBuiltinAuth: boolean;
+        providerName: string;
+      } }).data ?? json;
+      this.logger.debug(
+        `OIDC config: enabled=${data.enabled}, providerName=${data.providerName}`,
+      );
+      return data;
+    } catch (e) {
+      this.logger.debug(`OIDC config fetch error: ${e}`);
+      return Fail(FT.Network, 'Failed to get OIDC config');
+    }
+  }
+
+  public getOidcLoginUrl(): string {
+    return '/api/auth/oidc/login';
   }
 }

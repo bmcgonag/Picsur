@@ -84,6 +84,7 @@ export class SettingsUsersEditComponent implements OnInit {
 
     // Set that data instead
     this.model.putUsername(user.username);
+    this.model.putEmail(user.email);
     this.model.putRoles(user.roles);
   }
 

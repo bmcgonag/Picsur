@@ -6,6 +6,15 @@
     <mat-cell *matCellDef="let user">{{ user.username }}</mat-cell>
   </ng-container>
 
+  <ng-container matColumnDef="email">
+    <mat-header-cell class="d-none d-md-flex" *matHeaderCellDef
+      >Email</mat-header-cell
+    >
+    <mat-cell class="d-none d-md-flex" *matCellDef="let user">{{
+      user.email || '-'
+    }}</mat-cell>
+  </ng-container>
+
   <ng-container matColumnDef="roles">
     <mat-header-cell class="d-none d-md-flex" *matHeaderCellDef
       >Roles</mat-header-cell
