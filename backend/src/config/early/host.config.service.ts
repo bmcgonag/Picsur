@@ -37,7 +37,9 @@ export class HostConfigService {
   }
 
   public getOrigin(): string | undefined {
-    return ParseString(this.configService.get(`${EnvPrefix}ORIGIN`)) ?? undefined;
+    return (
+      ParseString(this.configService.get(`${EnvPrefix}ORIGIN`)) ?? undefined
+    );
   }
 
   public isDemo() {

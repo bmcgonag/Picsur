@@ -28,7 +28,10 @@ export class OidcController {
     return undefined;
   }
 
-  private getCallbackOrigin(req: FastifyRequest, config: { issuer: string }): string {
+  private getCallbackOrigin(
+    req: FastifyRequest,
+    _config: { issuer: string },
+  ): string {
     const storedOrigin = this.hostConfigService.getOrigin();
     if (storedOrigin) {
       return storedOrigin;
@@ -46,7 +49,10 @@ export class OidcController {
   }
 
   @Get('login')
-  async login(@Req() req: FastifyRequest, @Res() res: FastifyReply): Promise<void> {
+  async login(
+    @Req() req: FastifyRequest,
+    @Res() res: FastifyReply,
+  ): Promise<void> {
     const isEnabled = await this.oidcConfigService.isOidcEnabled();
     if (!isEnabled) {
       res.code(404).send({ error: 'OIDC is not enabled' });
@@ -96,7 +102,9 @@ export class OidcController {
     const codeVerifier = codeVerifierQuery || cookies?.['oidc_code_verifier'];
     const origin = this.getOrigin(req);
 
-    this.logger.error(`OIDC callback received: code=${!!code}, state=${!!state}, cookieState=${!!cookieState}, codeVerifier=${!!codeVerifier}, origin=${origin}`);
+    this.logger.error(
+      `OIDC callback received: code=${!!code}, state=${!!state}, cookieState=${!!cookieState}, codeVerifier=${!!codeVerifier}, origin=${origin}`,
+    );
 
     const isPopup =
       rawRequest.headers?.accept?.includes('text/html') ||
@@ -142,7 +150,12 @@ export class OidcController {
 
     try {
       const result = ThrowIfFailed(
-        await this.oidcService.handleCallback(state, code, codeVerifier, origin),
+        await this.oidcService.handleCallback(
+          state,
+          code,
+          codeVerifier,
+          origin,
+        ),
       );
 
       this.logger.error(`OIDC auth successful, isPopup=${isPopup}`);

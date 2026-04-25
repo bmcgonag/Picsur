@@ -103,14 +103,20 @@ export class OidcService {
 
   private getRedirectUri(requestOrigin?: string): string {
     const origin = this.hostConfigService.getOrigin() ?? requestOrigin;
-    const uri = origin ? `${origin}/api/auth/oidc/callback` : '/api/auth/oidc/callback';
-    this.logger.error(`getRedirectUri: ORIGIN env=${this.hostConfigService.getOrigin()}, requestOrigin=${requestOrigin}, uri=${uri}`);
+    const uri = origin
+      ? `${origin}/api/auth/oidc/callback`
+      : '/api/auth/oidc/callback';
+    this.logger.error(
+      `getRedirectUri: ORIGIN env=${this.hostConfigService.getOrigin()}, requestOrigin=${requestOrigin}, uri=${uri}`,
+    );
     return uri;
   }
 
   private getTokenExchangeUri(requestOrigin?: string): string {
     const origin = this.hostConfigService.getOrigin() ?? requestOrigin;
-    return origin ? `${origin}/api/auth/oidc/callback` : '/api/auth/oidc/callback';
+    return origin
+      ? `${origin}/api/auth/oidc/callback`
+      : '/api/auth/oidc/callback';
   }
 
   async handleCallback(
@@ -123,7 +129,9 @@ export class OidcService {
     if (HasFailed(config)) return config;
 
     const redirectUri = this.getTokenExchangeUri(requestOrigin);
-    this.logger.error(`Token exchange: redirect_uri=${redirectUri}, code_len=${code?.length}, verifier_len=${codeVerifier?.length}`);
+    this.logger.error(
+      `Token exchange: redirect_uri=${redirectUri}, code_len=${code?.length}, verifier_len=${codeVerifier?.length}`,
+    );
 
     try {
       const currentUrl = new URL(redirectUri, 'http://localhost');
@@ -133,21 +141,30 @@ export class OidcService {
 
       const oidcConfig = await this.oidcConfigService.getOidcConfig();
       const clientId = HasFailed(oidcConfig) ? '' : oidcConfig.clientId;
-      const issuerUrl = (config as any).issuer || (config as any).issuerUrl || 'https://auth.routemehome.org/application/o/picsur/';
+      const issuerUrl =
+        (config as any).issuer ||
+        (config as any).issuerUrl ||
+        'https://auth.routemehome.org/application/o/picsur/';
       this.logger.error(`Issuer URL: ${issuerUrl}`);
 
       const openidConfigUrl = `${issuerUrl.replace(/\/$/, '')}/.well-known/openid-configuration`;
       this.logger.error(`OpenID config URL: ${openidConfigUrl}`);
 
-      let tokenEndpoint = (config as any).issuer?.metadata?.token_endpoint || (config as any).metadata?.token_endpoint;
+      let tokenEndpoint =
+        (config as any).issuer?.metadata?.token_endpoint ||
+        (config as any).metadata?.token_endpoint;
       this.logger.error(`Token endpoint from config: ${tokenEndpoint}`);
 
       if (!tokenEndpoint) {
         try {
           const openidResp = await fetch(openidConfigUrl);
-          const openidData = (await openidResp.json()) as { token_endpoint?: string };
+          const openidData = (await openidResp.json()) as {
+            token_endpoint?: string;
+          };
           tokenEndpoint = openidData.token_endpoint;
-          this.logger.error(`Token endpoint from OIDC discovery: ${tokenEndpoint}`);
+          this.logger.error(
+            `Token endpoint from OIDC discovery: ${tokenEndpoint}`,
+          );
         } catch (e) {
           this.logger.error(`Failed to fetch OIDC discovery: ${e}`);
         }
@@ -170,7 +187,10 @@ export class OidcService {
       this.logger.error(`Token HTTP status: ${httpResponse.status}`);
 
       if (!httpResponse.ok) {
-        return Fail(FT.Authentication, `Token exchange failed: ${responseText}`);
+        return Fail(
+          FT.Authentication,
+          `Token exchange failed: ${responseText}`,
+        );
       }
 
       const tokenData = JSON.parse(responseText);
@@ -188,7 +208,9 @@ export class OidcService {
 
       return await this.findOrCreateUser(userInfo);
     } catch (e) {
-      this.logger.error(`OIDC callback failed: ${e} | Stack: ${(e as Error)?.stack}`);
+      this.logger.error(
+        `OIDC callback failed: ${e} | Stack: ${(e as Error)?.stack}`,
+      );
       return Fail(FT.Authentication, `OIDC callback failed: ${e}`);
     }
   }

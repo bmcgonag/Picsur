@@ -44,14 +44,14 @@ export class LoginComponent implements OnInit {
       history.replaceState(null, '');
     }
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       if (params['oidc-token']) {
         this.handleOidcToken(params['oidc-token']);
         this.router.navigate([], {
           relativeTo: this.route,
           queryParams: { 'oidc-token': null },
           queryParamsHandling: 'merge',
-          replaceUrl: true
+          replaceUrl: true,
         });
       }
     });
@@ -69,7 +69,10 @@ export class LoginComponent implements OnInit {
         if (event.data?.type === 'oidc-success') {
           this.handleOidcToken(event.data.token);
         } else if (event.data?.type === 'oidc-error') {
-          this.errorService.error('OIDC Error: ' + event.data.error, this.logger);
+          this.errorService.error(
+            'OIDC Error: ' + event.data.error,
+            this.logger,
+          );
         }
       };
     } catch (e) {
@@ -128,7 +131,10 @@ export class LoginComponent implements OnInit {
 
     console.log('Event data:', event.data);
     if (event.data?.type === 'oidc-success') {
-      console.log('OIDC success detected, token:', event.data.token?.substring(0, 20) + '...');
+      console.log(
+        'OIDC success detected, token:',
+        event.data.token?.substring(0, 20) + '...',
+      );
       this.handleOidcToken(event.data.token);
     } else if (event.data?.type === 'oidc-error') {
       this.errorService.error('OIDC Error: ' + event.data.error, this.logger);

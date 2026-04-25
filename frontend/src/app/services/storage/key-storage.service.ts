@@ -27,10 +27,16 @@ export class KeyStorageService {
   }
 
   public set(key: string) {
-    console.log('KeyStorageService.set called with:', key?.substring(0, 20) + '...');
+    console.log(
+      'KeyStorageService.set called with:',
+      key?.substring(0, 20) + '...',
+    );
     this.key = key;
     this.store();
-    console.log('Key stored, localStorage:', localStorage.getItem('apiKey')?.substring(0, 20) + '...');
+    console.log(
+      'Key stored, localStorage:',
+      localStorage.getItem('apiKey')?.substring(0, 20) + '...',
+    );
   }
 
   public clear() {

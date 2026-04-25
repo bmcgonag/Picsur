@@ -181,11 +181,16 @@ export class UserService {
       }
 
       const json = await response.json();
-      const data = (json as { data?: {
-        enabled: boolean;
-        disableBuiltinAuth: boolean;
-        providerName: string;
-      } }).data ?? json;
+      const data =
+        (
+          json as {
+            data?: {
+              enabled: boolean;
+              disableBuiltinAuth: boolean;
+              providerName: string;
+            };
+          }
+        ).data ?? json;
       this.logger.debug(
         `OIDC config: enabled=${data.enabled}, providerName=${data.providerName}`,
       );

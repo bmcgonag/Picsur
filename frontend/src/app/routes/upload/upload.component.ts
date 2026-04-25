@@ -29,7 +29,9 @@ export class UploadComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.canUpload = this.permissionService.snapshot.includes(Permission.ImageUpload);
+    this.canUpload = this.permissionService.snapshot.includes(
+      Permission.ImageUpload,
+    );
     this.onPermission();
     this.onFileChange();
   }
